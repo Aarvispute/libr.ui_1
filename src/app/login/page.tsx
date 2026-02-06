@@ -22,7 +22,7 @@ export default function LoginPage() {
     
     // Simulate API delay for dramatic effect
     setTimeout(() => {
-      router.push("/"); // Redirect to Landing Page
+      router.push("/dashboard"); // Redirect to Landing Page
     }, 1500);
   };
 
