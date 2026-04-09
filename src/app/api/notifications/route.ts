@@ -70,7 +70,7 @@ function startOfDay(value: Date): number {
 function buildCheckoutNotifications(checkouts: CheckoutRecord[]): NotificationRecord[] {
   const today = startOfDay(new Date());
 
-  return checkouts.flatMap((checkout) => {
+  return checkouts.flatMap<NotificationRecord>((checkout) => {
     if (!checkout.due_date || !checkout.checkout_id) {
       return [];
     }
@@ -120,7 +120,7 @@ function isHoldReady(hold: HoldRecord): boolean {
 }
 
 function buildHoldNotifications(holds: HoldRecord[]): NotificationRecord[] {
-  return holds.flatMap((hold) => {
+  return holds.flatMap<NotificationRecord>((hold) => {
     if (!isHoldReady(hold)) {
       return [];
     }
