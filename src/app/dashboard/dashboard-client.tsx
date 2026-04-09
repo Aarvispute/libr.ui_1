@@ -1286,9 +1286,9 @@ export function DashboardInteractiveShell({
         onShowPassword={() => setIsPasswordOpen(true)} 
       />
 
-      <main className="flex-1 container mx-auto px-4 py-8 flex flex-col lg:flex-row gap-8 overflow-hidden">
+      <main className="flex-1 w-full min-w-0 px-4 py-8 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-8 overflow-hidden">
         {/* LEFT SECTION (Dynamic Content) */}
-        <div className="flex-1 flex flex-col gap-8">
+        <div className="flex-1 min-w-0 flex flex-col gap-8">
           {/* Search Bar */}
           <form onSubmit={handleSearch} className="flex flex-col gap-2 mt-[2vh]">
             <div className="flex gap-2">
@@ -1409,7 +1409,7 @@ export function DashboardInteractiveShell({
         </div>
 
         {/* RIGHT SECTION (Wheel) */}
-        <div className="w-full lg:w-96 flex flex-col gap-6 overflow-hidden">
+        <div className="w-full min-w-0 lg:w-96 lg:min-w-[24rem] lg:flex-none flex flex-col gap-6 overflow-hidden">
           <div className="hidden lg:flex flex-col h-[calc(100%_-_2vh)] mt-[2vh] gap-4">
             <div className="h-[45%] flex flex-col">
               <div
