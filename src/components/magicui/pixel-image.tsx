@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 // ✅ 1. We define the strict types we expect
@@ -42,7 +43,9 @@ export function PixelImage({
   const pixels = useMemo(() => {
     return Array.from({ length: rows * cols }).map((_, i) => ({
       id: i,
-      delay: Math.random() * pixelFadeInDuration,
+      delay:
+        Math.abs(Math.sin(i * 12.9898 + rows * 78.233 + cols * 37.719)) *
+        pixelFadeInDuration,
     }));
   }, [rows, cols, pixelFadeInDuration]);
 
@@ -54,9 +57,11 @@ export function PixelImage({
       )}
     >
       {/* Background Image */}
-      <img
+      <Image
         src={src}
         alt="pixel-image-bg"
+        fill
+        sizes="100vw"
         className="absolute inset-0 w-full h-full object-cover"
       />
 
@@ -71,16 +76,30 @@ export function PixelImage({
         {pixels.map((pixel) => (
           <div
             key={pixel.id}
-            className="w-full h-full animate-fade-out"
+            className="w-full h-full"
             style={{
               backgroundColor: pixelColor,
+              animationName: "pixel-image-fade-out",
               animationDuration: `${pixelFadeInDuration}s`,
               animationDelay: `${pixel.delay}s`,
+              animationTimingFunction: "ease-out",
               animationFillMode: "forwards",
             }}
           />
         ))}
       </div>
+
+      <style jsx>{`
+        @keyframes pixel-image-fade-out {
+          from {
+            opacity: 1;
+          }
+
+          to {
+            opacity: 0;
+          }
+        }
+      `}</style>
     </div>
   );
 }

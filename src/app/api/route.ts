@@ -1,35 +1,39 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
+import fs from "fs/promises";
 import path from "path";
 
-// ✅ 1. Force the API to re-check the folder every time (fixes caching issues)
-export const dynamic = "force-dynamic";
+// Revalidate the statically generated response every 1 hour
+export const revalidate = 3600;
 
 type BooksResponse = {
   images: string[];
 };
 
+const globalAny = global as any;
+
 export async function GET() {
   try {
+    if (globalAny.booksCache) {
+      return NextResponse.json<BooksResponse>({ images: globalAny.booksCache });
+    }
+
     const booksDirectory = path.join(process.cwd(), "public", "books");
 
-    if (!fs.existsSync(booksDirectory)) {
+    let fileNames: string[] = [];
+    try {
+      fileNames = await fs.readdir(booksDirectory);
+    } catch {
       console.log("Books directory not found");
       return NextResponse.json<BooksResponse>({ images: [] });
     }
 
-    const fileNames = fs.readdirSync(booksDirectory);
-
     const images = fileNames
       .filter((file) => /\.(jpg|jpeg|png|webp|avif|gif)$/i.test(file))
-      .map((file) => {
-        // ✅ 2. Encode filenames to handle spaces (e.g. "Book Name.png" -> "Book%20Name.png")
-        return `/books/${encodeURIComponent(file)}`;
-      });
+      .map((file) => `/books/${encodeURIComponent(file)}`);
 
-    // Debugging: Check your terminal to see if files are found
-    console.log(`Found ${images.length} images`); 
-    
+    globalAny.booksCache = images;
+    console.log(`Found ${images.length} images`);
+
     return NextResponse.json<BooksResponse>({ images });
   } catch (error) {
     console.error("API Error:", error);

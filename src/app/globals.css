@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -128,53 +127,3 @@
     overflow-x: hidden; 
   }
 }
-
-/* ✅ ANIMATIONS */
-
-/* Fade Out Animation */
-@keyframes fade-out {
-  0% { opacity: 1; }
-  100% { opacity: 0; }
-}
-
-.animate-fade-out {
-  animation-name: fade-out;
-  animation-timing-function: ease-out;
-  animation-fill-mode: forwards;
-  animation-duration: 1s; 
-}
-
-/* Marquee Animation (Horizontal) */
-@keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(calc(-100% - var(--gap))); }
-}
-
-/* Marquee Animation (Vertical) */
-@keyframes marquee-vertical {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(calc(-100% - var(--gap))); }
-}
-
-/* Animation Classes */
-.animate-marquee {
-  /* We use !important to override any Tailwind conflicts */
-  animation: marquee var(--duration) linear infinite !important;
-}
-
-.animate-marquee-vertical {
-  animation: marquee-vertical var(--duration) linear infinite !important;
-}
-@keyframes ripple {
-  to {
-    width: 400px;
-    height: 400px;
-    opacity: 0;
-    transform: translate(-50%, -50%);
-  }
-}
-
-.animate-ripple {
-  animation: ripple 600ms ease-out;
-}
-

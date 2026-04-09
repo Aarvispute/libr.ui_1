@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import React from "react";
 
 interface MarqueeProps {
   className?: string;
@@ -6,7 +7,7 @@ interface MarqueeProps {
   pauseOnHover?: boolean;
   children?: React.ReactNode;
   vertical?: boolean;
-  repeat?: number;
+  repeat?: number; // This prop is no longer used for a seamless loop
   [key: string]: any;
 }
 
@@ -16,17 +17,17 @@ export function Marquee({
   pauseOnHover = false,
   children,
   vertical = false,
-  repeat = 4,
+  repeat, // This is unused now
   ...props
 }: MarqueeProps) {
   return (
     <div
       {...props}
-      // ✅ FORCE VARIABLES HERE: We bypass Tailwind for these critical values
       style={{
-        "--duration": "30s",
-        "--gap": "1rem",
-      } as React.CSSProperties} 
+        "--duration": "15s",
+        "--gap": "1rem", // This gap is between the items inside children
+        ...props.style,
+      } as React.CSSProperties}
       className={cn(
         "group flex overflow-hidden p-2 [gap:var(--gap)]",
         {
@@ -36,23 +37,21 @@ export function Marquee({
         className
       )}
     >
-      {Array(repeat)
-        .fill(0)
-        .map((_, i) => (
-          <div
-            key={i}
-            // We duplicate the gap style here just in case
-            style={{ gap: "var(--gap)" }} 
-            className={cn("flex shrink-0 justify-around", {
-              "animate-marquee flex-row": !vertical,
-              "animate-marquee-vertical flex-col": vertical,
-              "group-hover:[animation-play-state:paused]": pauseOnHover,
-              "[animation-direction:reverse]": reverse,
-            })}
-          >
-            {children}
-          </div>
-        ))}
+      <div
+        className={cn("flex min-w-full shrink-0", {
+          "animate-marquee flex-row": !vertical,
+          "animate-marquee-vertical flex-col": vertical,
+          "group-hover:[animation-play-state:paused]": pauseOnHover,
+          "[animation-direction:reverse]": reverse,
+        })}
+      >
+        <div className={cn("flex items-center [gap:var(--gap)]", { "flex-row": !vertical, "flex-col": vertical })}>
+          {children}
+        </div>
+        <div aria-hidden="true" className={cn("flex items-center [gap:var(--gap)]", { "flex-row": !vertical, "flex-col": vertical })}>
+          {children}
+        </div>
+      </div>
     </div>
   );
 }

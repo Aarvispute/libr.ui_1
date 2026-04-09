@@ -7,21 +7,16 @@ module.exports = {
     extend: {
       keyframes: {
         marquee: {
-          "0%": { transform: "translateX(0%)" },
-          "100%": { transform: "translateX(-100%)" },
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+        "marquee-vertical": {
+          "0%": { transform: "translateY(0)" },
+          "100%": { transform: "translateY(-50%)" },
         },
         "fade-out": {
           "0%": { opacity: "1" },
           "100%": { opacity: "0" },
-        },
-        rippling: {
-          "0%": {
-            opacity: "1",
-          },
-          "100%": {
-            transform: "scale(2)",
-            opacity: "0",
-          },
         },
         // ✅ NEW: Added ripple animation for gallery navigation
         ripple: {
@@ -38,9 +33,9 @@ module.exports = {
         },
       },
       animation: {
-        marquee: "marquee 30s linear infinite",
+        marquee: "marquee var(--duration) linear infinite",
+        "marquee-vertical": "marquee-vertical var(--duration) linear infinite",
         "fade-out": "fade-out 1s ease-out forwards",
-        rippling: "rippling 0.6s ease-out",
         // ✅ NEW: Added ripple animation
         ripple: "ripple 600ms ease-out",
       },

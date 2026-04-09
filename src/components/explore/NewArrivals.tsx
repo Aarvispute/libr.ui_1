@@ -1,33 +1,25 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
-import Link from "next/link";
-import { Marquee } from "@/components/magicui/marquee"; 
+import { Marquee } from "@/components/magicui/marquee";
+import { getBooks } from "@/lib/books-client";
 
-export function NewArrivals({ reverse = false }: { reverse?: boolean }) {
+interface NewArrivalsProps {
+  onImageClick?: () => void;
+}
+
+export function NewArrivals({ onImageClick }: NewArrivalsProps) {
   const [bookCovers, setBookCovers] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Fetch Logic (Same as before)
   useEffect(() => {
-    async function fetchBooks() {
-      try {
-        const response = await fetch("/api"); 
-        if (!response.ok) throw new Error("API Failed");
-        
-        const data = await response.json();
-        if (data.images) setBookCovers(data.images);
-      } catch (error) {
-        console.error("Failed", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchBooks();
+    getBooks()
+      .then((covers) => setBookCovers(covers))
+      .finally(() => setIsLoading(false));
   }, []);
 
-  if (isLoading) {
-    return <div className="h-full w-full animate-pulse bg-neutral-900/20 rounded-lg" />;
-  }
+  if (isLoading) return <div className="h-full w-full animate-pulse bg-neutral-900/20 rounded-lg" />;
 
   if (bookCovers.length === 0) {
     return (
@@ -38,40 +30,32 @@ export function NewArrivals({ reverse = false }: { reverse?: boolean }) {
   }
 
   return (
-    <div className="h-full w-full flex flex-col overflow-hidden">
-      <div className="flex-1 relative flex items-center w-full overflow-hidden">
-        {/* Edge fade mask */}
-        <div className="absolute inset-0 z-10 pointer-events-none [mask-image:linear-gradient(to_right,transparent,black_20%,black_80%,transparent)]" />
-        
-        {/* ✅ FIX: key forces Marquee to remount when reverse changes */}
-        <Marquee
-          key={reverse.toString()}
-          pauseOnHover
-          reverse={reverse}
-          className="[--duration:30s]"
-        >
+    <div className="h-full w-full flex flex-col overflow-hidden group">
+      <div className="flex-1 relative flex items-center w-full [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+        <Marquee pauseOnHover>
           {bookCovers.map((src, idx) => (
-            <Link
+            <button
               key={`${src}-${idx}`}
-              href="#"
-              className="relative h-40 w-28 flex-shrink-0 cursor-pointer mx-2"
+              onClick={onImageClick}
+              className="relative h-40 w-28 flex-shrink-0 cursor-pointer transition-transform duration-300 hover:scale-[1.02] active:scale-95"
             >
-              <div className="relative h-full w-full rounded-md overflow-hidden border border-white/10 bg-neutral-900 shadow-sm transition-all duration-300 hover:scale-105 hover:ring-2 hover:ring-green-500">
+              <div className="relative h-full w-full rounded-md overflow-hidden border border-white/10 bg-neutral-900 shadow-sm hover:ring-2 hover:ring-green-500">
                 <Image
                   src={src}
-                  alt="Book Cover"
+                  alt={`Book Cover ${idx + 1}`}
                   fill
                   className="object-cover"
                   sizes="120px"
+                  draggable={false}
                 />
               </div>
-            </Link>
+            </button>
           ))}
         </Marquee>
       </div>
 
-      <p className="text-center text-[10px] uppercase tracking-wider text-neutral-500 font-medium mt-2">
-        New Arrivals
+      <p className="text-center text-[10px] uppercase tracking-wider text-neutral-500 font-medium mt-1">
+        New Arrivals • Use Wheel to Browse
       </p>
     </div>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PixelImage } from "@/components/magicui/pixel-image";
 import { cn } from "@/lib/utils";
@@ -19,6 +19,7 @@ export function Gallery({ showControls = true }: GalleryProps) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const total = galleryImages.length;
 
@@ -58,37 +59,33 @@ export function Gallery({ showControls = true }: GalleryProps) {
     return () => window.removeEventListener("keydown", onKey);
   }, [prev, next]);
 
-  // Show controls on mouse movement, hide after 3 seconds of inactivity
-  useEffect(() => {
+  const handleMouseMove = () => {
     if (!showControls) return;
-
-    let timeout: NodeJS.Timeout;
-
-    const handleMouseMove = () => {
-      setControlsVisible(true);
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        setControlsVisible(false);
-      }, 3000);
-    };
-
-    const handleMouseLeave = () => {
+    setControlsVisible(true);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
       setControlsVisible(false);
-      clearTimeout(timeout);
-    };
+    }, 3000);
+  };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseleave", handleMouseLeave);
+  const handleMouseLeave = () => {
+    if (!showControls) return;
+    setControlsVisible(false);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+  };
 
+  useEffect(() => {
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseleave", handleMouseLeave);
-      clearTimeout(timeout);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, [showControls]);
+  }, []);
 
   return (
-    <div className="h-full w-full relative rounded-lg overflow-hidden bg-black/20">
+    <div 
+      className="h-full w-full relative rounded-lg overflow-hidden bg-black/20"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
       {/* Image */}
       <PixelImage
         key={index}
@@ -108,13 +105,13 @@ export function Gallery({ showControls = true }: GalleryProps) {
         >
           <div
             className={cn(
-              "flex items-center gap-4 px-4 py-2",
+              "flex items-center gap-3 px-3 py-1.5",
               "rounded-full bg-black/60 backdrop-blur-md",
               "shadow-lg border border-white/10"
             )}
           >
             <RippleButton onClick={prev} ariaLabel="Previous image">
-              <ChevronLeft className="h-5 w-5" />
+              <ChevronLeft className="h-4 w-4" />
             </RippleButton>
 
             <span className="text-xs text-white/70 select-none">
@@ -122,15 +119,15 @@ export function Gallery({ showControls = true }: GalleryProps) {
             </span>
 
             <RippleButton onClick={next} ariaLabel="Next image">
-              <ChevronRight className="h-5 w-5" />
+              <ChevronRight className="h-4 w-4" />
             </RippleButton>
           </div>
         </div>
       )}
 
       {/* Caption */}
-      <div className="absolute bottom-3 left-3 z-10 pointer-events-none
-                      bg-black/60 text-white px-3 py-1 rounded-full
+      <div className="absolute bottom-1 left-3 z-10 pointer-events-none
+                      bg-black/60 text-white px-3 py-0.5 rounded-full
                       text-xs backdrop-blur-md">
         Campus Highlights
       </div>
@@ -153,7 +150,7 @@ function RippleButton({
       onClick={onClick}
       aria-label={ariaLabel}
       className="
-        relative h-9 w-9 rounded-full
+        relative h-8 w-8 rounded-full
         flex items-center justify-center
         text-white
         hover:bg-white/10 

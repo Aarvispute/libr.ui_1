@@ -6,47 +6,21 @@ import Link from "next/link";
 import { ArrowLeft, Search, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { getBooks } from "@/lib/books-client";
 
-// ✅ CONFIGURATION:
-// In production, the backend dev changes this string to their real API URL.
-const API_ENDPOINT = "/api"; 
-
-// ✅ THE ADAPTER (Translation Layer):
-const adaptBooksResponse = (data: any): string[] => {
-  if (!data) return [];
-  
-  // 1. Handle our Mock API format
-  if (data.images && Array.isArray(data.images)) {
-    return data.images;
-  }
-  return [];
-};
-
-// ✅ CRITICAL: This must be 'export default function'
 export default function NewArrivalsPage() {
   const [books, setBooks] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchBooks() {
-      try {
-        const response = await fetch(API_ENDPOINT);
-        const rawData = await response.json();
-        const cleanBooks = adaptBooksResponse(rawData);
-        setBooks(cleanBooks);
-      } catch (error) {
-        console.error("Failed to load books", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchBooks();
+    getBooks()
+      .then((cleanBooks) => setBooks(cleanBooks))
+      .finally(() => setIsLoading(false));
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-8">
+    <div className="min-h-screen bg-background pb-12 pt-4 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto space-y-8">
-        
         {/* Header */}
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
           <div className="flex items-center gap-4 w-full md:w-auto">
@@ -56,15 +30,15 @@ export default function NewArrivalsPage() {
               </Button>
             </Link>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">New Arrivals</h1>
-              <p className="text-muted-foreground text-sm">Just added to the collection</p>
+              <h1 className="text-3xl font-bold tracking-tight">New Arrivals</h1>
+              <p className="text-sm text-muted-foreground mt-1">Recently added books to our collection</p>
             </div>
           </div>
-
-          <div className="flex gap-2 w-full md:w-auto">
+          
+          <div className="flex w-full md:w-auto gap-2">
              <div className="relative flex-1 md:w-64">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search titles..." className="pl-9" />
+               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+               <Input placeholder="Search arrivals..." className="pl-9 bg-muted/50" />
              </div>
              <Button variant="outline"><Filter className="h-4 w-4 mr-2" /> Filter</Button>
           </div>

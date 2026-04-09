@@ -18,9 +18,10 @@ interface SpinningWheelProps {
   onIdChange: (id: number) => void;
   // Callback for the gallery modal (since it overlays on the current page)
   onOpenGallery: () => void;
+  onOpenNewArrivals?: () => void;
 }
 
-export function SpinningWheel({ activeId, onIdChange, onOpenGallery }: SpinningWheelProps) {
+export function SpinningWheel({ activeId, onIdChange, onOpenGallery, onOpenNewArrivals }: SpinningWheelProps) {
   const radius = 115; 
   const anglePerItem = 360 / WHEEL_ITEMS.length;
   const rotation = -(activeId * anglePerItem);
@@ -40,13 +41,13 @@ export function SpinningWheel({ activeId, onIdChange, onOpenGallery }: SpinningW
                 className="flex flex-col items-center gap-2"
               >
                 <span className="text-[9px] uppercase tracking-widest text-green-500 font-bold">Browse</span>
-                <Link 
-                   href="/new-arrivals"
+                <button 
+                   onClick={onOpenNewArrivals}
                    className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-500 hover:bg-green-500 hover:text-white transition-all duration-300"
                 >
                    <span className="text-xs font-medium">Open</span>
                    <BookOpen className="h-3 w-3" />
-                </Link>
+                </button>
               </motion.div>
             )}
 
